@@ -18,15 +18,21 @@ Group sessions take up to 15 players. Times are US Eastern.
 
 ## Put it online with Vercel
 
-1. **Import the project.** In Vercel, choose **Add New → Project**, pick the `KB-Movement` GitHub repository and click **Import**. Leave the build settings as they are; `vercel.json` takes care of them.
-2. **Set your coach password.** Before clicking Deploy, open **Environment Variables** and add `ADMIN_PASSWORD` with a password of your choice. Then click **Deploy**.
-3. **Add the database.** In the new project, open the **Storage** tab, choose **Neon** (free plan) and create a database. When asked, connect it to this project for all environments. This adds `DATABASE_URL` for you.
-4. **Redeploy.** Open **Deployments**, click the menu on the latest deployment and choose **Redeploy**, so the site picks up the database.
-5. **Check it.** Visit `https://YOUR-SITE.vercel.app/api/health`. It should say `"database":"postgres"`. Then open the site, make a demo booking, and sign in at `/#coach` with your password to see it on the roster.
+**Step 1: get a link (about 2 minutes).** In Vercel, choose **Add New → Project**, pick the `KB-Movement` GitHub repository, click **Import**, then **Deploy**. Leave the settings as they are. When it finishes, Vercel shows your link (like `kb-movement.vercel.app`), which anyone can open.
+
+Until a database is connected, the site runs as a **demo**. Everything works, but bookings and invite codes are saved in each visitor's own browser, and the coach dashboard password is `coach`. A banner at the top says it's a preview.
+
+**Step 2: make bookings real (when you're ready).**
+1. In the project, open **Settings → Environment Variables** and add `ADMIN_PASSWORD` with your own password.
+2. Open the **Storage** tab, choose **Neon** (free plan) and create a database. Connect it to this project for all environments. This adds `DATABASE_URL`.
+3. Open **Deployments**, click the menu on the latest deployment and choose **Redeploy**.
+4. Visit `https://YOUR-SITE.vercel.app/api/health`. It should say `"database":"postgres"`. The demo banner is gone, and bookings now show up in your coach dashboard at `/#coach`.
 
 Optional: add `PUBLIC_URL` (your site's address) so Winter Select invite messages include the link, then redeploy.
 
 Every push to the `main` branch redeploys the site automatically.
+
+If Vercel doesn't list the repository, click **Adjust GitHub App Permissions** on the import screen and give Vercel access to `KB-Movement`.
 
 ## Switch on real payments later
 
@@ -80,7 +86,7 @@ npm test                # bookings, week pricing, capacity, holds, codes, coach 
 ## How it's built
 
 - `server.js`: Express API (bookings, Stripe Checkout and webhook, Winter Select, coach sign-in with a signed cookie)
-- `api/index.js` and `vercel.json`: run the API as a Vercel serverless function and serve `public/` from Vercel's CDN
+- `api/index.js`, `vercel.json` and `scripts/build-site.js`: run the API as a Vercel serverless function and serve the site from Vercel's CDN (demo mode until a database is connected)
 - `lib/store.js`: Postgres database (Neon on Vercel, or the built-in PGlite locally)
 - `public/core.js`: schedule, pricing and validation rules, shared by the browser and the server
 - `public/app.js`, `public/graphics.js`, `public/styles.css`: the website and its illustrations, with no front-end framework

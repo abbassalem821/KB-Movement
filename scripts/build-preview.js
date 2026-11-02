@@ -17,10 +17,12 @@ for (const s of scripts) if (/<\/script/i.test(s)) throw new Error('A script con
 const pub = config.publicConfig();
 // Photos are embedded as data URIs so the single-file preview can show them.
 const mime = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp', avif: 'image/avif' };
-pub.photos = pub.photos.map((p) => {
-  const file = path.join(root, 'public', decodeURIComponent(p));
-  return `data:${mime[path.extname(file).slice(1).toLowerCase()]};base64,${fs.readFileSync(file).toString('base64')}`;
-});
+const inline = (p) => {
+  if (!p) return p;
+  const file = path.join(root, 'public', decodeURIComponent(p.src));
+  return Object.assign({}, p, { src: `data:${mime[path.extname(file).slice(1).toLowerCase()]};base64,${fs.readFileSync(file).toString('base64')}` });
+};
+pub.photos = { coach: inline(pub.photos.coach), items: pub.photos.items.map(inline) };
 const cfg = JSON.stringify(pub).replace(/</g, '\\u003c');
 
 const html = [

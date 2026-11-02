@@ -172,10 +172,16 @@
   function viewHome() {
     var c = S.cfg;
     var g = groupTracks()[0], p = privateTrack();
-    var photos = c.photos || [];
-    var heroSide = photos.length
-      ? '<div class="hero-photo"><img src="' + h(photos[0]) + '" alt="A ' + h(c.businessName) + ' training session"></div>'
-      : Art.heroScene();
+    var photos = c.photos || { coach: null, items: [] };
+    var heroPhoto = photos.items[0];
+    var coach = photos.coach;
+    var heroSide = '<div class="hero-media">' +
+      (heroPhoto
+        ? '<div class="hero-photo" style="aspect-ratio:' + heroPhoto.w + '/' + heroPhoto.h + '"><img src="' + h(heroPhoto.src) + '" width="' + heroPhoto.w + '" height="' + heroPhoto.h + '" alt="' + h(c.businessName) + ' players on the field"></div>'
+        : Art.heroScene()) +
+      (coach ? '<figure class="coach-badge"><img src="' + h(coach.src) + '" width="' + coach.w + '" height="' + coach.h + '" alt="Portrait of your coach">' +
+        '<figcaption><strong>Your coach</strong><span>At every session, every week</span></figcaption></figure>' : '') +
+      '</div>';
     var save = g.price * c.days.length - g.bundlePrice;
     return '' +
       '<section class="hero"><div class="wrap hero-grid">' +
@@ -187,7 +193,10 @@
       '</div>' + heroSide +
       '</div>' + Art.wave() + '</section>' +
 
-      '<section class="section"><div class="wrap two-col"><div class="section-head"><h2 class="h2">When we train</h2><p class="lede">Three evenings a week, with each session matched to your player\'s age.</p></div>' + scheduleCard() + '</div></section>' +
+      '<section class="section"><div class="wrap two-col"><div class="section-head"><h2 class="h2">When we train</h2><p class="lede">Three evenings a week, with each session matched to your player\'s age.</p>' +
+      (heroPhoto ? '<div class="train-art">' + Art.heroScene() + '</div>' : '') + '</div>' + scheduleCard() + '</div></section>' +
+
+      photoStrip() +
 
       '<section class="section section-alt"><div class="wrap">' +
       '<div class="section-head"><h2 class="h2">Prices</h2><p class="lede">Every session is paid for when you book, so your player\'s spot is saved.</p></div>' +
@@ -216,8 +225,6 @@
       bringItem(Art.bottle(), 'Water bottle', 'A full one. Sessions are 75 minutes') +
       '</div></div></section>' +
 
-      photoStrip() +
-
       '<section class="winter-band">' + Art.snowField() + '<div class="wrap">' +
       '<div><h2>' + SNOW + 'Winter Select</h2>' +
       '<p>' + h(c.winter.summary) + ' I choose the players myself and send each family a personal invite code by text or email.</p>' +
@@ -240,13 +247,14 @@
     if (!host || !host.url) return '';
     return '<a class="host-link" href="' + h(host.url) + '" target="_blank" rel="noopener">See their tournament schedule</a>';
   }
+  /* Remaining photos, shown side by side at their natural shape so nobody gets cropped out. */
   function photoStrip() {
-    var photos = (S.cfg.photos || []).slice(1);
-    if (!photos.length) return '';
+    var items = ((S.cfg.photos || {}).items || []).slice(1);
+    if (!items.length) return '';
     return '<section class="section section-alt"><div class="wrap">' +
-      '<div class="section-head"><h2 class="h2">At training</h2></div>' +
-      '<div class="photo-strip">' + photos.map(function (src, i) {
-        return '<figure class="photo' + (i === 0 ? ' photo-lead' : '') + '"><img src="' + h(src) + '" alt="Training photo ' + (i + 1) + '" loading="lazy"></figure>';
+      '<div class="section-head"><h2 class="h2">On the field</h2></div>' +
+      '<div class="photo-row">' + items.map(function (p) {
+        return '<figure class="photo" style="--ar:' + (p.w / p.h).toFixed(3) + '"><img src="' + h(p.src) + '" width="' + p.w + '" height="' + p.h + '" alt="' + h(S.cfg.businessName) + ' players on the field" loading="lazy"></figure>';
       }).join('') + '</div></div></section>';
   }
   function bringItem(icon, title, note) {

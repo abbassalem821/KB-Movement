@@ -1,0 +1,23 @@
+{
+  "name": "kb-movement",
+  "version": "1.0.0",
+  "description": "Booking site for youth soccer training: age-group calendar, Stripe payments, Winter Select invite codes, coach dashboard.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --env-file-if-exists=.env --watch server.js",
+    "build:preview": "node scripts/build-preview.js",
+    "test": "node --test test/*.test.js"
+  },
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@electric-sql/pglite": "^0.5.14",
+    "express": "^5.3.0",
+    "pg": "^8.23.1",
+    "stripe": "^23.1.0"
+  },
+  "private": true,
+  "engines": {
+    "node": "22.x"
+  }
+}
